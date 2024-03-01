@@ -18,7 +18,7 @@ app = Flask(__name__)
 CORS(app)
 app.config['SECRET_KEY'] = secret_key
 app.config['MONGO_URI'] = "mongodb://" + urllib.parse.quote_plus(sys.argv[1]) + ":"\
-        + urllib.parse.quote_plus(sys.argv[2]) + "@127.0.0.1:27017/protect-auth?authSource=admin"
+        + urllib.parse.quote_plus(sys.argv[2]) + "@127.0.0.1:27017/protect?authSource=admin"
 mongo = PyMongo(app)
 
 def generate_token(user_id):

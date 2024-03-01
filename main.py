@@ -5,6 +5,7 @@ from bson import json_util
 from bson.json_util import dumps
 from bson.objectid import ObjectId
 from flask_cors import CORS
+from functools import wraps
 import smtplib, ssl
 import os
 import sys
@@ -13,6 +14,7 @@ import json
 import random
 import string
 import time
+import jwt
 
 app = Flask(__name__)  # Flask server
 CORS(app)
@@ -21,11 +23,38 @@ client = MongoClient()  # Create client object
 
 load_dotenv()  # Load environment variables
 
+secret_key = os.getenv('SECRETKEY')
+
+app.config['SECRET_KEY'] = secret_key
+
 mongouri = "mongodb://" + urllib.parse.quote_plus(sys.argv[1]) + ":"\
         + urllib.parse.quote_plus(sys.argv[2]) + "@127.0.0.1:27017/"
 client = MongoClient(mongouri)  # Client makes connection
 
 db = client['protect']  # Select database
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+
+        if 'Authorization' in request.headers:
+            token = request.headers['Authorization'].split(' ')[1]
+            print(token)
+
+        if not token:
+            return jsonify({'message': 'Token is missing'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            current_user = db.users.find_one({'_id': ObjectId(data['user_id'])})
+            print(current_user)
+        except:
+            return jsonify({'message': 'Token is invalid'}), 401
+
+        return f(current_user, *args, **kwargs)
+
+    return decorated
 
 @app.route('/app/info_student', methods=['POST'])
 def app_info_student():
@@ -35,7 +64,7 @@ def app_info_student():
     student_info = json.loads(json_util.dumps(student_info))
     return student_info
 
-@app.route('/dashboard/update', methods=['POST'])
+@app.route('/app/update', methods=['POST'])
 def dasbboard_update():
     new_student_data = request.get_json()
     matricula = new_student_data["matricula"]
@@ -58,13 +87,15 @@ def dashboard_upload():
     return jsonify({"status": "Data uploaded"})
 
 @app.route('/dashboard/safe/info', methods=['GET'])
-def dashboard_safe_info():
+@token_required
+def dashboard_safe_info(current_user):
     safe_students = db.safe.find()
     safe_students = json.loads(json_util.dumps(safe_students))
     return safe_students
 
 @app.route('/dashboard/emergency/info', methods=['GET'])
-def dashboard_emergency_info():
+@token_required
+def dashboard_emergency_info(current_user):
     emergency_students = db.emergency.find()
     emergency_students = json.loads(json_util.dumps(emergency_students))
     return emergency_students
