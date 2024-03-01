@@ -43,6 +43,9 @@ def register():
         'email': data['email'],
         'password': hashed_password
     }
+    existing_user = mongodb.users.find_one({'email': data['email']})
+    if existing_user:
+        return jsonify({'message': 'User already registered'}), 409
     mongo.db.users.insert_one(user)
     return jsonify({'message': 'User registered successfully'})
 

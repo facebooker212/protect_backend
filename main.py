@@ -40,7 +40,6 @@ def token_required(f):
 
         if 'Authorization' in request.headers:
             token = request.headers['Authorization'].split(' ')[1]
-            print(token)
 
         if not token:
             return jsonify({'message': 'Token is missing'}), 401
@@ -48,7 +47,6 @@ def token_required(f):
         try:
             data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = db.users.find_one({'_id': ObjectId(data['user_id'])})
-            print(current_user)
         except:
             return jsonify({'message': 'Token is invalid'}), 401
 
@@ -58,17 +56,17 @@ def token_required(f):
 
 @app.route('/app/info_student', methods=['POST'])
 def app_info_student():
-    matricula = request.get_json()
-    matricula = matricula["matricula"]
-    student_info = db.students.find_one({"matricula": matricula})
+    email = request.get_json()
+    email = email["email"]
+    student_info = db.students.find_one({"email": email})
     student_info = json.loads(json_util.dumps(student_info))
     return student_info
 
 @app.route('/app/update', methods=['POST'])
 def dasbboard_update():
     new_student_data = request.get_json()
-    matricula = new_student_data["matricula"]
-    update_student = db.students.update_one({"matricula": matricula}, {"$set": new_student_data})
+    email = new_student_data["email"]
+    update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
     return jsonify({"status": "Data updated"})
 
 @app.route('/dashboard/upload', methods=['POST'])
