@@ -88,6 +88,7 @@ def app_info_student():
 @pin_required
 def dasbboard_update():
     new_student_data = request.get_json()
+    new_student_data.pop("PIN")
     email = new_student_data["email"]
     update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
     return jsonify({"status": "Data updated"})
@@ -98,6 +99,7 @@ def dashboard_upload():
     info = request.get_json()
     section = info["section"]
     info.pop("section")
+    info.pop("PIN")
     if section == "register":
         add_student = db.students.insert_one(info)
     elif section == "safe":
