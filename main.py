@@ -6,6 +6,7 @@ from bson.json_util import dumps
 from bson.objectid import ObjectId
 from flask_cors import CORS
 from functools import wraps
+from datetime import datetime
 import smtplib, ssl
 import os
 import sys
@@ -32,6 +33,11 @@ mongouri = "mongodb://" + urllib.parse.quote_plus(sys.argv[1]) + ":"\
 client = MongoClient(mongouri)  # Client makes connection
 
 db = client['protect']  # Select database
+
+def getTime():
+    today = datetime.now()
+    d1 = today.strftime("%d/%m/%Y %H:%M:%S")
+    return d1
 
 def token_required(f):
     @wraps(f)
@@ -95,8 +101,10 @@ def dashboard_upload():
     if section == "register":
         add_student = db.students.insert_one(info)
     elif section == "safe":
+        info["fecha"] = getTime()
         add_safe = db.safe.insert_one(info)
     elif section == "emergency":
+        info["fecha"] = getTime()
         add_emergency = db.emergency.insert_one(info)
     else:
         return jsonify({"status": "No section"})
