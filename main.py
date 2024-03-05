@@ -130,7 +130,6 @@ def dashboard_safe_coordinates(current_user):
         }
     ]
     coordinates = list(db.safe.aggregate(pipeline))
-    print(coordinates)
     return coordinates
 
 @app.route('/dashboard/emergency/coordinates', methods=['GET'])
@@ -146,7 +145,6 @@ def dashboard_emergency_coordinates(current_user):
         }
     ]
     coordinates = list(db.safe.aggregate(pipeline))
-    print(coordinates)
     return coordinates
 
 @app.route('/dashboard/safe/info', methods=['GET'])
