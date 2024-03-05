@@ -64,27 +64,33 @@ def pin_required(f):
     pin = secret_key
 
     if f != pin:
-        return jsonify({'message': 'PIN is invalid'}), 401
+        return false
     elif f == pin:
         return true
 
 @app.route('/app/info_student', methods=['POST'])
-@pin_required
 def app_info_student():
     email = request.get_json()
-    email = email["email"]
-    student_info = db.students.find_one({"email": email})
-    student_info = json.loads(json_util.dumps(student_info))
-    return student_info
+    PIN = email["PIN"]
+    if pin_required(PIN):
+        email = email["email"]
+        student_info = db.students.find_one({"email": email})
+        student_info = json.loads(json_util.dumps(student_info))
+        return student_info
+    else:
+        return jsonify({"status": "Invalid or missing PIN"}), 401
 
 @app.route('/app/update', methods=['POST'])
-@pin_required
 def dasbboard_update():
     new_student_data = request.get_json()
-    new_student_data.pop("PIN")
-    email = new_student_data["email"]
-    update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
-    return jsonify({"status": "Data updated"})
+    PIN = new_student_data["PIN"]
+    if pin_required(PIN):
+        new_student_data.pop("PIN")
+        email = new_student_data["email"]
+        update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
+        return jsonify({"status": "Data updated"})
+    else:
+        return jsonify({"status": "Invalid or missing PIN"}), 401
 
 @app.route('/dashboard/upload', methods=['POST'])
 def dashboard_upload():
@@ -106,8 +112,7 @@ def dashboard_upload():
             return jsonify({"status": "No section"})
         return jsonify({"status": "Data uploaded"})
     else:
-        status = pin_required(PIN)
-        return status
+        return jsonify({"status": "Invalid or missing PIN"}), 401
 
 @app.route('/dashboard/safe/info', methods=['GET'])
 @token_required
