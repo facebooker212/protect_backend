@@ -64,9 +64,9 @@ def pin_required(f):
     pin = secret_key
 
     if f != pin:
-        return false
+        return False
     elif f == pin:
-        return true
+        return True
 
 @app.route('/app/info_student', methods=['POST'])
 def app_info_student():
@@ -92,7 +92,7 @@ def dasbboard_update():
             update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
             return jsonify({"status": "Data updated"})
         else:
-            update_student = db.insert_one(new_student_data) 
+            update_student = db.students.insert_one(new_student_data) 
     else:
         return jsonify({"status": "Invalid or missing PIN"}), 401
 
