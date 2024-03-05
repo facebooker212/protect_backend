@@ -144,7 +144,7 @@ def dashboard_emergency_coordinates(current_user):
             }
         }
     ]
-    coordinates = list(db.safe.aggregate(pipeline))
+    coordinates = list(db.emergency.aggregate(pipeline))
     return coordinates
 
 @app.route('/dashboard/safe/info', methods=['GET'])
