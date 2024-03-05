@@ -125,10 +125,12 @@ def dashboard_coordinates():
             "$project": {
                 "lat": "$latitud",
                 "lng": "$longitud"
+                "_id": 0
             }
         }
     ]
     coordinates = list(db.safe.aggregate(pipeline))
+    print(coordinates)
     return coordinates
 
 @app.route('/dashboard/safe/info', methods=['GET'])
