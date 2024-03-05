@@ -124,7 +124,7 @@ def dashboard_coordinates():
         {
             "$project": {
                 "lat": "$latitud",
-                "lng": "$longitud"
+                "lng": "$longitud",
                 "_id": 0
             }
         }
