@@ -63,9 +63,9 @@ def token_required(f):
 def pin_required(f):
     pin = secret_key
 
-    if request.args.get('PIN') != pin:
+    if f != pin:
         return jsonify({'message': 'PIN is invalid'}), 401
-    elif request.args.get('PIN') == pin:
+    elif f == pin:
         return true
 
 @app.route('/app/info_student', methods=['POST'])
