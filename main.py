@@ -93,7 +93,7 @@ def dashboard_update():
             return jsonify({"status": "Data updated"})
         else:
             update_student = db.students.insert_one(new_student_data)
-            return jsonify("status": "Student registered")
+            return jsonify({"status": "Student registered"})
     else:
         return jsonify({"status": "Invalid or missing PIN"}), 401
 
