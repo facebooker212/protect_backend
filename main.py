@@ -99,14 +99,15 @@ def dashboard_upload():
     info = request.get_json()
     section = info["section"]
     info.pop("section")
-    info.pop("PIN")
     if section == "register":
         add_student = db.students.insert_one(info)
     elif section == "safe":
         info["fecha"] = getTime()
+        info.pop("PIN")
         add_safe = db.safe.insert_one(info)
     elif section == "emergency":
         info["fecha"] = getTime()
+        info.pop("PIN")
         add_emergency = db.emergency.insert_one(info)
     else:
         return jsonify({"status": "No section"})
