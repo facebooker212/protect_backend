@@ -118,8 +118,24 @@ def dashboard_upload():
         return jsonify({"status": "Invalid or missing PIN"}), 401
 
 @app.route('/dashboard/safe/coordinates', methods=['GET'])
-#@token_required
-def dashboard_coordinates():
+@token_required
+def dashboard_safe_coordinates(current_user):
+    pipeline = [
+        {
+            "$project": {
+                "lat": "$latitud",
+                "lng": "$longitud",
+                "_id": 0
+            }
+        }
+    ]
+    coordinates = list(db.safe.aggregate(pipeline))
+    print(coordinates)
+    return coordinates
+
+@app.route('/dashboard/emergency/coordinates', methods=['GET'])
+@token_required
+def dashboard_emergency_coordinates(current_user):
     pipeline = [
         {
             "$project": {
