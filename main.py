@@ -81,7 +81,7 @@ def app_info_student():
         return jsonify({"status": "Invalid or missing PIN"}), 401
 
 @app.route('/app/update', methods=['POST'])
-def dasbboard_update():
+def dashboard_update():
     new_student_data = request.get_json()
     PIN = new_student_data["PIN"]
     if pin_required(PIN):
@@ -92,7 +92,8 @@ def dasbboard_update():
             update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
             return jsonify({"status": "Data updated"})
         else:
-            update_student = db.students.insert_one(new_student_data) 
+            update_student = db.students.insert_one(new_student_data)
+            return jsonify("status": "Student registered")
     else:
         return jsonify({"status": "Invalid or missing PIN"}), 401
 
@@ -104,9 +105,7 @@ def dashboard_upload():
     if pin_required(PIN):
         info.pop("section")
         info.pop("PIN")
-        if section == "register":
-            add_student = db.students.insert_one(info)
-        elif section == "safe":
+        if section == "safe":
             info["fecha"] = getTime()
             add_safe = db.safe.insert_one(info)
         elif section == "emergency":
