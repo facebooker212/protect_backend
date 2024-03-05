@@ -119,7 +119,7 @@ def dashboard_upload():
 
 @app.route('/dashboard/safe/coordinates', methods=['GET'])
 #@token_required
-def dashboard_coordinates(current_user):
+def dashboard_coordinates():
     pipeline = [
         {
             "$project": {
