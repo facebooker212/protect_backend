@@ -61,19 +61,12 @@ def token_required(f):
     return decorated
 
 def pin_required(f):
-    @wraps(f)
-    def decorated(*args, **kwargs):
-        pin = secret_key
+    pin = secret_key
 
-        if 'PIN' not in request.args:
-            return jsonify({'message': 'PIN is missing'}), 401
-
-        if request.args.get('PIN') != pin:
-            return jsonify({'message': 'PIN is invalid'}), 401
-
-        return f(*args, **kwargs)
-
-    return decorated
+    if request.args.get('PIN') != pin:
+        return jsonify({'message': 'PIN is invalid'}), 401
+    elif request.args.get('PIN') == pin:
+        return true
 
 @app.route('/app/info_student', methods=['POST'])
 @pin_required
@@ -94,7 +87,6 @@ def dasbboard_update():
     return jsonify({"status": "Data updated"})
 
 @app.route('/dashboard/upload', methods=['POST'])
-@pin_required
 def dashboard_upload():
     info = request.get_json()
     section = info["section"]
