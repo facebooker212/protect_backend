@@ -90,20 +90,24 @@ def dasbboard_update():
 def dashboard_upload():
     info = request.get_json()
     section = info["section"]
-    info.pop("section")
-    if section == "register":
-        add_student = db.students.insert_one(info)
-    elif section == "safe":
-        info["fecha"] = getTime()
+    PIN = info["PIN"]
+    if pin_required(PIN):
+        info.pop("section")
         info.pop("PIN")
-        add_safe = db.safe.insert_one(info)
-    elif section == "emergency":
-        info["fecha"] = getTime()
-        info.pop("PIN")
-        add_emergency = db.emergency.insert_one(info)
+        if section == "register":
+            add_student = db.students.insert_one(info)
+        elif section == "safe":
+            info["fecha"] = getTime()
+            add_safe = db.safe.insert_one(info)
+        elif section == "emergency":
+            info["fecha"] = getTime()
+            add_emergency = db.emergency.insert_one(info)
+        else:
+            return jsonify({"status": "No section"})
+        return jsonify({"status": "Data uploaded"})
     else:
-        return jsonify({"status": "No section"})
-    return jsonify({"status": "Data uploaded"})
+        status = pin_required(PIN)
+        return status
 
 @app.route('/dashboard/safe/info', methods=['GET'])
 @token_required
