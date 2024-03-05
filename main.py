@@ -87,8 +87,12 @@ def dasbboard_update():
     if pin_required(PIN):
         new_student_data.pop("PIN")
         email = new_student_data["email"]
-        update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
-        return jsonify({"status": "Data updated"})
+        check_if_registered = db.students.find_one({"email": email})
+        if check_if_registered:
+            update_student = db.students.update_one({"email": email}, {"$set": new_student_data})
+            return jsonify({"status": "Data updated"})
+        else:
+            update_student = db.insert_one(new_student_data) 
     else:
         return jsonify({"status": "Invalid or missing PIN"}), 401
 
