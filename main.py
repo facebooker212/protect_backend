@@ -100,17 +100,20 @@ def dashboard_update():
 @app.route('/dashboard/upload', methods=['POST'])
 def dashboard_upload():
     info = request.get_json()
+    email = info["email"]
     section = info["section"]
     PIN = info["PIN"]
+    new_info = db.students.find_one({"email": email})
+    new_info["latitud"] = info["latitud"]
+    new_info["longitud"] = info["longitud"]
+    new_info.pop("_id")
     if pin_required(PIN):
-        info.pop("section")
-        info.pop("PIN")
         if section == "safe":
-            info["fecha"] = getTime()
-            add_safe = db.safe.insert_one(info)
+            new_info["fecha"] = getTime()
+            add_safe = db.safe.insert_one(new_info)
         elif section == "emergency":
-            info["fecha"] = getTime()
-            add_emergency = db.emergency.insert_one(info)
+            new_info["fecha"] = getTime()
+            add_emergency = db.emergency.insert_one(new_info)
         else:
             return jsonify({"status": "No section"})
         return jsonify({"status": "Data uploaded"})
